@@ -22,27 +22,22 @@ public class Main {
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
-        // Source Processor
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String,String> wordCountInput = builder.stream("word-count-input");
 
-        // Processor
         KTable<String, Long> wordCounts = wordCountInput.mapValues(textLine -> textLine
                         .toLowerCase())
                         .flatMapValues(lowerCasedTextLine -> Arrays.asList(lowerCasedTextLine.split(" ")))
                         .selectKey((ignoredKey, word) -> word)
                         .groupByKey()
                         .count(Named.as("Counts"));
-
-        // Sink Processor
         wordCounts.toStream().to("word-count-output", Produced.with(Serdes.String(),Serdes.Long()));
+
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
 
-        // Log topology
         System.out.println(streams);
 
-        // shutdown hook to close the streams application
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
 
     }
