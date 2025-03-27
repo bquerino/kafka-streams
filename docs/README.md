@@ -59,3 +59,57 @@ In this section, we will see examples of `high level dsl` and the `low level pro
 - Should ever be deleted, altered or published to. **They are internal**
 
 > If you list your topics probably will see something like `${application.id}-KSTREAM-AGGREGATE-STATE-STORE-${number}-repartition` and the same name ending with `changelog`.
+
+---
+
+## KStreams and KTables
+
+### **KStream**
+
+KStream treats each message as an event (“change log”). All occurrences of (Alice, 1) and (Alice, 2) are in the stream.
+
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant T as KafkaTopic
+    participant KS as KStream
+
+    P->>T: (Alice, 1)
+    T->>KS: (Alice, 1)
+    note right of KS: Primeiro evento<br/>no stream
+
+    P->>T: (Alice, 2)
+    T->>KS: (Alice, 2)
+    note right of KS: Segundo evento<br/>no stream
+
+```
+
+### **KTable**
+
+KTable maintains a current state per key. When it reaches (Alice, 2), it overwrites (Alice, 1). In the end, only (Alice, 2) exists for the key “Alice”. And when it receives a null value, it deletes the record, as in the case of (Bob, null).
+
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant T as KafkaTopic
+    participant KT as KTable
+
+    P->>T: (Alice, 1)
+    T->>KT: (Alice, 1)
+    note right of KT: KTable faz<br/>Alice -> 1
+
+    P->>T: (Alice, 2)
+    T->>KT: (Alice, 2)
+    note right of KT: KTable faz upsert<br/>Alice -> 2
+
+    P->>T: (Bob, 10)
+    T->>KT: (Bob, 10)
+    note right of KT: KTable faz<br/>Bob -> 10
+
+    P->>T: (Bob, null) - tombstone
+    T->>KT: (Bob, null)
+    note right of KT: KTable remove<br/>Bob
+
+```
+
+---
