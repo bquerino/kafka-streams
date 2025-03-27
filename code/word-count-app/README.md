@@ -30,8 +30,9 @@ docker build -t my-kafka-streams-app .
 ### Run the container
 
 ```bash
-docker run -d --name my-kafka-streams-app my-kafka-streams-app
+docker run -d --name my-kafka-streams-app --network infra_kafka-net my-kafka-streams-app
 ```
+> This network is used inside the docker-compose.
 
 ### Clean up
 
@@ -48,6 +49,7 @@ docker rm my-kafka-streams-app
 
 ## Reference
 
-- [Baeldung - Introduction to KafkaStreams in Java](https://www.baeldung.com/java-kafka-streams)
 - [Apache Kafka Series - Kafka Streams for Data Processing](https://www.udemy.com/course/kafka-streams)
+- [Baeldung - Introduction to KafkaStreams in Java](https://www.baeldung.com/java-kafka-streams)
 - [Mastering Kafka Streams and ksqlDB](https://learning.oreilly.com/library/view/mastering-kafka-streams/9781492062486/ch07.html)
+- [Kafka Streams Developer Guide for Confluent Platform](https://docs.confluent.io/platform/current/streams/developer-guide/overview.html)
