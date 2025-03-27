@@ -39,3 +39,23 @@ In this section, we will see examples of `high level dsl` and the `low level pro
 ### **Low Level Processor API**
 
 #TODO
+
+---
+
+## Internal Topics
+
+- Running a Kafka Streams may eventually create internal intermediary topics.
+
+### Types
+
+- **Repartitioning topics**: in case you start transforming the key of your stream, a repartitioning will happen at some processor.
+- **Changelog topics**: in case you perform aggregations, Kafka Streams will save compacted data in these topics
+
+### Observations
+
+- Are managed by Kafka Streams
+- Are used by Kafka Streams to save / restore state and repartition data
+- Are prefixed by application.id parameter
+- Should ever be deleted, altered or published to. **They are internal**
+
+> If you list your topics probably will see something like `${application.id}-KSTREAM-AGGREGATE-STATE-STORE-${number}-repartition` and the same name ending with `changelog`.
