@@ -76,11 +76,11 @@ sequenceDiagram
 
     P->>T: (Alice, 1)
     T->>KS: (Alice, 1)
-    note right of KS: Primeiro evento<br/>no stream
+    note right of KS: First event<br/> stream
 
     P->>T: (Alice, 2)
     T->>KS: (Alice, 2)
-    note right of KS: Segundo evento<br/>no stream
+    note right of KS: Second event<br/>stream
 
 ```
 
@@ -96,15 +96,15 @@ sequenceDiagram
 
     P->>T: (Alice, 1)
     T->>KT: (Alice, 1)
-    note right of KT: KTable faz<br/>Alice -> 1
+    note right of KT: KTable stores<br/>Alice -> 1
 
     P->>T: (Alice, 2)
     T->>KT: (Alice, 2)
-    note right of KT: KTable faz upsert<br/>Alice -> 2
+    note right of KT: KTable do upsert<br/>Alice -> 2
 
     P->>T: (Bob, 10)
     T->>KT: (Bob, 10)
-    note right of KT: KTable faz<br/>Bob -> 10
+    note right of KT: KTable do<br/>Bob -> 10
 
     P->>T: (Bob, null) - tombstone
     T->>KT: (Bob, null)
