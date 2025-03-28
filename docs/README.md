@@ -81,8 +81,11 @@ sequenceDiagram
     P->>T: (Alice, 2)
     T->>KS: (Alice, 2)
     note right of KS: Second event<br/>stream
-
 ```
+
+> KStream is recomended when you are reading from a topic that's not compacted.
+> If new data is partial information / transactional aswell.
+
 
 ### **KTable**
 
@@ -109,7 +112,9 @@ sequenceDiagram
     P->>T: (Bob, null) - tombstone
     T->>KT: (Bob, null)
     note right of KT: KTable remove<br/>Bob
-
 ```
+
+> KTable is recommended when you are reading from a topic that's log-compacted(aggregations).
+> KTable more if you need a structure that's like a `database table`, where every update is self suficient (like total bank balance)
 
 ---

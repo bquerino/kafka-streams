@@ -1,6 +1,6 @@
-# **Word Count App**
+# **Favourite Colour**
 
-This application is based on the example described [here](https://www.baeldung.com/java-kafka-streams).
+This application is based on the example described [here](https://www.udemy.com/course/kafka-streams/).
 
 --- 
 
@@ -22,7 +22,7 @@ mvn clean package
 After the build step, you should have your JAR file (e.g., app.jar) in the target/ directory. To create the Docker image, run:
 
 ```bash
-docker build -t my-kafka-streams-app .
+docker build -t favourite-colour-app .
 ```
 - t my-kafka-streams-app sets the name (tag) of the Docker image.
 - . indicates that the Dockerfile is in the current directory.
@@ -30,7 +30,7 @@ docker build -t my-kafka-streams-app .
 ### Run the container
 
 ```bash
-docker run -d --name my-kafka-streams-app --network infra_kafka-net my-kafka-streams-app
+docker run -d --name favourite-colour-app --network infra_kafka-net favourite-colour-app
 ```
 > This network is used inside the docker-compose.
 
@@ -39,8 +39,8 @@ docker run -d --name my-kafka-streams-app --network infra_kafka-net my-kafka-str
 To stop and remove the container when you're done:
 
 ```bash
-docker stop my-kafka-streams-app
-docker rm my-kafka-streams-app
+docker stop favourite-colour-app
+docker rm favourite-colour-app
 ```
 
 > You can test running this app from the IDE and docker to see how Kafka will handle with the consumer group.

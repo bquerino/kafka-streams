@@ -31,7 +31,7 @@ public class Main {
                         .selectKey((ignoredKey, word) -> word)
                         .groupByKey()
                         .count(Named.as("Counts"));
-        wordCounts.toStream().to("word-count-output", Produced.with(Serdes.String(),Serdes.Long()));
+         wordCounts.toStream().to("word-count-output", Produced.with(Serdes.String(),Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
