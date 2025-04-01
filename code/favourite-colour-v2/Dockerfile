@@ -4,7 +4,7 @@ FROM openjdk:17-jdk-slim
 # Set the working directory inside the container
 WORKDIR /app
 # Copy the jar file (built by Maven or another build tool)
-COPY target/favourite-colour-1.0-SNAPSHOT.jar /app/app.jar
+COPY target/favourite-colour-v2-1.0-SNAPSHOT.jar /app/app.jar
 
 # Environment Variables
 ENV APPLICATION_ID_CONFIG=favourite-colour

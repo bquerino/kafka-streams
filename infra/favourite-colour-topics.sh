@@ -6,7 +6,7 @@ PARTITIONS=3                              # Number of partitions
 REPLICATION_FACTOR=1                      # Replication factor
 
 # Topics names
-TOPICS=("favourite-colour-input" "favourite-colour-output")
+TOPICS=("favourite-colour-input" "user-keys-and-colours" "favourite-colour-output")
 
 # Base URL for listing clusters
 CLUSTERS_URL="$KAFKA_REST_URL/v3/clusters"
@@ -31,6 +31,13 @@ HEADERS=(
 
 # Create each topic inside the TOPICS array
 for TOPIC_NAME in "${TOPICS[@]}"; do
+
+  CLEANUP_POLICY="delete"  # default policy
+
+  if [[ "$TOPIC_NAME" == "user-keys-and-colours" || "$TOPIC_NAME" == "favourite-colour-output" ]]; then
+    CLEANUP_POLICY="compact"
+  fi
+
   # Request body in JSON
   PAYLOAD=$(cat <<EOF
 {
@@ -38,7 +45,7 @@ for TOPIC_NAME in "${TOPICS[@]}"; do
   "partitions_count": $PARTITIONS,
   "replication_factor": $REPLICATION_FACTOR,
   "configs": [
-    {"name": "cleanup.policy", "value": "delete"},
+    {"name": "cleanup.policy", "value": "$CLEANUP_POLICY"},
     {"name": "retention.ms", "value": "604800000"}
   ]
 }

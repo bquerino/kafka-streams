@@ -23,6 +23,10 @@ This repository will show how Kafka Streams API works.
 - Run `docker-compose up -d` to start Kafka, and any additional services.
 - Verify that containers are running correctly.
 
+### Kafka configs
+
+- For any additional config or something that you need to see in your kafka topics use the [Control Center](http://localhost:9021/).
+
 ### Build and Run Java Projects
 
 - Navigate to each project in `/code`.
