@@ -56,6 +56,8 @@ public class Main {
         favouriteColours.toStream().to("favourite-colour-output", Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
+        // only for dev :)
+        streams.cleanUp();
         streams.start();
 
         // print the topology
