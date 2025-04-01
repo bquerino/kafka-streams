@@ -34,11 +34,100 @@ In this section, we will see examples of `high level dsl` and the `low level pro
 
 ### **High Level DSL**
 
-#TODO
+The High-Level DSL provides an intuitive, fluent API designed for rapid development, ease of use, and readability.
+
+#### Main Characteristics
+
+- High abstraction level: Simplifies common stream-processing operations.
+- Expressive and fluent API: Easy to write, read, and maintain.
+- Built-in operators: Filtering, mapping, aggregations, joins, windowing.
+
+#### DSL Example
+
+```java
+StreamsBuilder builder = new StreamsBuilder();
+builder.stream("input-topic")
+       .filter((key, value) -> value.contains("important"))
+       .mapValues(String::toUpperCase)
+       .to("output-topic");
+```
+
+#### When to use DSL
+
+- Quick prototyping and development.
+- Common scenarios like filtering, transformations, joins, windowing.
+- Applications that prioritize readability and ease of maintenance.
 
 ### **Low Level Processor API**
 
-#TODO
+The Low-Level Processor API offers granular control over each processing step, explicitly handling state stores, message flow, and time semantics.
+
+#### Main Characteristics
+
+- Low-level, granular control: Direct control over message processing, state stores, and forward operations.
+- Explicit state management: Direct interaction with state stores and processors.
+- Custom logic: Flexible implementation for advanced scenarios.
+
+#### Processor API Example
+
+```java
+Topology topology = new Topology();
+
+topology.addSource("Source", "input-topic")
+        .addProcessor("Processor", () -> new MyProcessor(), "Source")
+        .addSink("Sink", "output-topic", "Processor");
+
+class MyProcessor implements Processor<String, String> {
+    private ProcessorContext context;
+
+    @Override
+    public void init(ProcessorContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public void process(String key, String value) {
+        if (value.contains("important")) {
+            context.forward(key, value.toUpperCase());
+        }
+    }
+
+    @Override
+    public void close() {}
+}
+```
+
+#### When to use Processor API
+
+- Complex or custom processing logic.
+- Direct manipulation of message timestamps and headers.
+- Explicit access and management of state stores.
+- Advanced integrations or fine-grained optimization.
+
+### Comparison Table
+
+|Aspect|High-Level DSL|Low-Level Processor API|
+|------|--------------|-----------------------|
+|Complexity|✅ Simple, intuitive| ⚙️ More complex, detailed|
+|Level of Control|🟡 Moderate (abstracted control)|✅ High (fine-grained, explicit control)|
+|Ease of Use|✅ Easy, rapid development|⚙️ Requires deeper Kafka knowledge|
+|State Management|🟡 Abstracted (managed by Kafka Streams)|✅ Explicit, direct access|
+|Performance|🟡 Good, but less customizable|✅ Highly customizable, optimized|
+|Typical Use Cases|✅ Standard scenarios (filtering, mapping, joins, aggregations)|⚙️ Advanced or custom scenarios|
+
+
+### Combining Both Approaches
+
+You can combine the DSL and Processor API to leverage the strenghts of both approaches, for example:
+
+```java
+StreamsBuilder builder = new StreamsBuilder();
+
+builder.stream("input-topic")
+       .process(() -> new MyCustomProcessor())
+       .to("output-topic");
+```
+This allows you to start with the simplicity of the DSL and inject custom processors for specialized requirements.
 
 ---
 
