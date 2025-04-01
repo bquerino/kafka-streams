@@ -145,7 +145,7 @@ This allows you to start with the simplicity of the DSL and inject custom proces
 - Are managed by Kafka Streams
 - Are used by Kafka Streams to save / restore state and repartition data
 - Are prefixed by application.id parameter
-- Should ever be deleted, altered or published to. **They are internal**
+- Should never be deleted, altered or published to. **They are internal**
 
 > If you list your topics probably will see something like `${application.id}-KSTREAM-AGGREGATE-STATE-STORE-${number}-repartition` and the same name ending with `changelog`.
 
