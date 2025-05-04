@@ -1,4 +1,5 @@
 import com.brhenqu.Main;
+import com.brhenqu.TransactionsProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +13,7 @@ public class BankTransactionTest {
 
     @Test
     public void newRandomTransaction() throws JsonProcessingException {
-        ProducerRecord<String, String> record = Main.newRandomTransaction("john");
+        ProducerRecord<String, String> record = TransactionsProducer.newRandomTransaction("john");
         String key = record.key();
         String value = record.value();
 

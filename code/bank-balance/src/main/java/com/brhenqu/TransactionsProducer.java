@@ -9,10 +9,13 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.Instant;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TransactionsProducer {
@@ -39,28 +42,41 @@ public class TransactionsProducer {
         // leverage idempotent producer
         config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true); // ensure we don't send duplicates
 
-        Producer<String, String> producer = new KafkaProducer<>(config);
+        try (Producer<String, String> producer = new KafkaProducer<>(config)) {
+            int i = 0;
+            while (i < 100) {
+                System.out.println("Producing batch: " + i);
+                try {
+                    // Asynchronous sends with callbacks
+                    producer.send(newRandomTransaction("john"), (metadata, exception) -> {
+                        if (exception != null) {
+                            System.out.println("🛑 Error sending transaction for john: " + exception.getMessage());
+                        }
+                    });
 
-        int i = 0;
+                    producer.send(newRandomTransaction("bruno"), (metadata, exception) -> {
+                        if (exception != null) {
+                            System.out.println("🛑 Error sending transaction for bruno: " + exception.getMessage());
+                        }
+                    });
 
-        while (true){
-            System.out.println("Producing batch: " + i);
-            try {
-                producer.send(newRandomTransaction("john"));
-                producer.send(newRandomTransaction("bruno"));
-                producer.send(newRandomTransaction("maria"));
-                Thread.sleep(100);
-                i += 1;
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // boa prática
-                System.out.println("🛑 Failed to produce batch: " + i + " due to: " + e.getMessage());
-                break;
-            }finally {
-                producer.close();
-                System.out.println("✅ Producer closed.");
+                    producer.send(newRandomTransaction("maria"), (metadata, exception) -> {
+                        if (exception != null) {
+                            System.out.println("🛑 Error sending transaction for maria: " + exception.getMessage());
+                        }
+                    });
+
+                    Thread.sleep(100);
+                    i += 1;
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // boa prática
+                    System.out.println("🛑 Failed to produce batch: " + i + " due to: " + e.getMessage());
+                    break;
+                }
             }
+        } finally {
+            System.out.println("✅ Producer closed.");
         }
-        producer.close();
     }
 
     public static ProducerRecord<String, String> newRandomTransaction(String name){

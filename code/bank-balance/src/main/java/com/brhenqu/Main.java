@@ -15,7 +15,6 @@ import org.apache.kafka.streams.kstream.Produced;
 
 import java.time.Instant;
 import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 
 import static com.brhenqu.TransactionsProducer.getEnvOrDefault;
@@ -26,11 +25,12 @@ public class Main {
         // 🔁 Latch para manter a aplicação viva
         CountDownLatch latch = new CountDownLatch(1);
 
-        // 🔄 Executa o producer de forma assíncrona
-        CompletableFuture<Void> producerFuture = CompletableFuture.runAsync(() -> {
+        // 🔄 Inicia o producer de forma síncrona em uma thread separada
+        Thread producerThread = new Thread(() -> {
             System.out.println("🚀 Starting transaction producer...");
             TransactionsProducer.produce();
         });
+        producerThread.start();
 
         // Kafka Streams config
         Properties config = new Properties();
@@ -71,23 +71,24 @@ public class Main {
 
         bankBalance.toStream().to("bank-balance-exaclty-once", Produced.with(Serdes.String(), jsonNodeSerde));
 
-        KafkaStreams streams = new KafkaStreams(builder.build(), config);
+        try (KafkaStreams streams = new KafkaStreams(builder.build(), config)) {
 
-        // Shutdown Hook para encerramento gracioso
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("🛑 Shutting down Kafka Streams and producer...");
-            streams.close();
-            TransactionsProducer.stop(); // você criará esse método
-            latch.countDown(); // libera o main
-        }));
+            // Shutdown Hook para encerramento gracioso
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                System.out.println("🛑 Shutting down Kafka Streams and producer...");
+                streams.close();
+                TransactionsProducer.stop(); // você criará esse método
+                latch.countDown(); // libera o main
+            }));
 
-        // Inicia o Kafka Streams
-        try {
-            streams.start();
-            latch.await(); // bloqueia aqui até shutdown
-        } catch (Throwable e) {
-            System.err.println("❌ Fatal error: " + e.getMessage());
-            System.exit(1);
+            // Inicia o Kafka Streams
+            try {
+                streams.start();
+                latch.await(); // bloqueia aqui até shutdown
+            } catch (Throwable e) {
+                System.err.println("❌ Fatal error: " + e.getMessage());
+                System.exit(1);
+            }
         }
 
         System.exit(0);
